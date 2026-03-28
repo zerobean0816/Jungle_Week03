@@ -13,15 +13,12 @@ public class UIPuckItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDr
 
     public void Start()
     {
-        _playerPuckHandler = GameManager.Instance.player.GetComponent<PuckHandler>();
-        if (GameManager.Instance.player == null)
+        if (GameManager.Instance.Player == null)
         {
-            Debug.LogError("Player GameObject not found in the scene.");
+            Debug.LogError("[UIPuckItem] : Player GameObject not found in the scene.");
         }
-        else if (_playerPuckHandler == null)
-        {
-            Debug.LogError("PuckHandler component not found on player.");
-        }
+
+        _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
     }
 
     public void Init()

@@ -11,7 +11,7 @@ public class UIPuckSlot : MonoBehaviour, IDropHandler
 
     private void Start()
     {
-        _playerPuckHandler = GameManager.Instance.player.GetComponent<PuckHandler>();
+        _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
     }
 
     public void OnDrop(PointerEventData eventData)

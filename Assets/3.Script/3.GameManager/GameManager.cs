@@ -1,23 +1,36 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
-public enum GameState { Playing, PuckPaused, GameOver, Win }
+public enum GameState { Playing, PuckPaused, Paused, GameOver, Win , MainMenu}
 
 public class GameManager : MonoBehaviour
 {
     [Header("References")]
-    public GameObject player; // 플레이어 컨트롤러 참조
+    public GameObject Player; // 플레이어 컨트롤러 참조
     //public EnemySpawner enemySpawner; // 적 스포너 참조
-    
 
-    public GameState currentState { get; private set; } = GameState.Playing;
+    private GameState _gameState = GameState.Playing;
+    public GameState GameState
+    {
+        get => _gameState;
+        private set
+        {
+            if (_gameState == value) return; // 같은 상태면 무시
 
+            _gameState = value;
+            Debug.Log($"Game State changed to: {_gameState}");
+            OnGameStateChanged?.Invoke(); // 변경 시에만 발생
+        }
+    }
 
     [Header("Event")]
-    public UnityEvent onGameOver;
-    public UnityEvent onWin;
-    public UnityEvent onPuckPauseEnter;
-    public UnityEvent onPuckPauseExit;
+    public UnityEvent OnGameOver;
+    public UnityEvent OnWin;
+    public UnityEvent OnPuckPauseEnter;
+    public UnityEvent OnPuckPauseExit;
+    public UnityEvent OnGameStateChanged;
+
 
 
     public static GameManager Instance;
@@ -27,7 +40,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Is this line here?
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -37,19 +50,31 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        if (player == null)
+        if (Player == null)
         {
-            player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null)
+            Player = GameObject.FindGameObjectWithTag("Player");
+            if (Player == null)
             {
-                Debug.LogError("Player GameObject with tag 'Player' not found in the scene.");
+                Debug.LogError("[GameManager] : Player GameObject with tag 'Player' not found in the scene.");
             }
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            GameState = GameState.MainMenu; // 메인 메뉴에서는 메인 메뉴 상태로 시작
+        }
+        else
+        {
+            GameState = GameState.Playing; // 게임 씬에서는 플레이 상태로 시작
         }
     }
 
     private void Update()
     {
-        switch(currentState)
+        switch(GameState)
         {
             case GameState.Playing:
                 // 게임이 진행 중일 때의 로직
@@ -63,49 +88,57 @@ public class GameManager : MonoBehaviour
             case GameState.Win:
                 // 게임 승리 상태일 때의 로직
                 break;
-
+            case GameState.MainMenu:
+                // 메인 메뉴 상태일 때의 로직   
+                break;
+                
+             default:
+                 Debug.LogWarning($"Unhandled GameState: {GameState}");
+                 break;
         }
+
+
     }
 
 
     public void EnterPuckPause()
     {
-        if (currentState != GameState.Playing) return;
+        if (GameState != GameState.Playing) return;
 
-        currentState     = GameState.PuckPaused;
+        GameState     = GameState.PuckPaused;
         Time.timeScale   = 0f;
-        onPuckPauseEnter.Invoke();
+        OnPuckPauseEnter.Invoke();
     }
 
     /// <summary>퍽 UI 닫기 — 게임 재개</summary>
     public void ExitPuckPause()
     {
-        if (currentState != GameState.PuckPaused) return;
+        if (GameState != GameState.PuckPaused) return;
 
-        currentState     = GameState.Playing;
+        GameState     = GameState.Playing;
         Time.timeScale   = 1f;
-        onPuckPauseExit.Invoke();
+        OnPuckPauseExit.Invoke();
     }
 
     /// <summary>플레이어 사망 시 호출</summary>
     public void TriggerGameOver()
     {
-        if (currentState == GameState.GameOver) return;
+        if (GameState == GameState.GameOver) return;
 
-        currentState   = GameState.GameOver;
+        GameState   = GameState.GameOver;
         Time.timeScale = 0f;  // 게임 오버 화면에서 멈춤
-        onGameOver.Invoke();
+        OnGameOver.Invoke();
         Debug.Log("Game Over");
     }
 
     /// <summary>문 파괴 시 호출</summary>
     public void TriggerWin()
     {
-        if (currentState == GameState.Win) return;
+        if (GameState == GameState.Win) return;
 
-        currentState   = GameState.Win;
+        GameState   = GameState.Win;
         Time.timeScale = 0f;
-        onWin.Invoke();
+        OnWin.Invoke();
         Debug.Log("Win");
     }
 

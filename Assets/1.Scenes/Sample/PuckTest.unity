@@ -720,11 +720,6 @@ Transform:
   - {fileID: 1282921210}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &968211687 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 433168442985475593, guid: c480dd047ac18274587f9f04de7ba7f2, type: 3}
-  m_PrefabInstance: {fileID: 1010299459}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1010299459
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -776,6 +771,18 @@ PrefabInstance:
     - target: {fileID: 433168442985475593, guid: c480dd047ac18274587f9f04de7ba7f2, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8546361799986574669, guid: c480dd047ac18274587f9f04de7ba7f2, type: 3}
+      propertyPath: _moveAction.m_Name
+      value: Move
+      objectReference: {fileID: 0}
+    - target: {fileID: 8546361799986574669, guid: c480dd047ac18274587f9f04de7ba7f2, type: 3}
+      propertyPath: _spaceAction.m_Name
+      value: Space
+      objectReference: {fileID: 0}
+    - target: {fileID: 8546361799986574669, guid: c480dd047ac18274587f9f04de7ba7f2, type: 3}
+      propertyPath: _attackAction.m_Name
+      value: Attack
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1199,17 +1206,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57865c79d3035af4ea36387879192dd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  player: {fileID: 968211687}
-  onGameOver:
+  Player: {fileID: 0}
+  OnGameOver:
     m_PersistentCalls:
       m_Calls: []
-  onWin:
+  OnWin:
     m_PersistentCalls:
       m_Calls: []
-  onPuckPauseEnter:
+  OnPuckPauseEnter:
     m_PersistentCalls:
       m_Calls: []
-  onPuckPauseExit:
+  OnPuckPauseExit:
+    m_PersistentCalls:
+      m_Calls: []
+  OnGameStateChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1462575938

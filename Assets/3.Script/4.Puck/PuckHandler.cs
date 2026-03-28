@@ -7,7 +7,7 @@ public class PuckHandler : MonoBehaviour
 
     void Start()
     {
-        _playerStat = GameManager.Instance.player.GetComponent<PlayerStat>();
+        _playerStat = GetComponent<PlayerStat>();
         NullCheck.IsNull(_playerStat, "PlayerStat component not found on player.");
     }
 
