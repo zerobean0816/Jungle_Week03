@@ -1,49 +1,54 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PuckHandler : MonoBehaviour
 {
-    [SerializeField] private PuckData[] activePucks = new PuckData[3]; // 최대 3개의 퍽 슬롯
-    PlayerStat _playerStat;
+    // 슬롯 맵 대신 단순 리스트로 변경
+    private List<PuckData> _equippedPucks;
+    private PlayerStat _playerStat;
 
+    public int MaxListCount  = 12;
     void Start()
     {
         _playerStat = GetComponent<PlayerStat>();
+        _equippedPucks = new List<PuckData>(MaxListCount);
         NullCheck.IsNull(_playerStat, "PlayerStat component not found on player.");
     }
 
-    public void EquiedPuck(int slot, PuckData puckData)
+    /// <summary>퍽 장착</summary>
+    public void EquipPuck(PuckData puckData)
     {
-        activePucks[slot] = puckData;
+        if (puckData == null) return;
 
-        if (puckData == null)
-        {
-            RecalculateChangedPucks();
-            return;
-        }
-        _playerStat.AddModifiers(puckData.modifiers);
+        //if (_equippedPucks.Contains(puckData)) return;
+
+        GameManager.Instance.PuckCounts ++;
+        //Debug.Log("Packed! " + GameManager.Instance.PuckCounts);
+
+        _equippedPucks.Add(puckData);
+    }
+
+    /// <summary>퍽 해제 — 드래그로 꺼낼 때 호출</summary>
+    public void UnequipPuck(PuckData puckData)
+    {
+        if (puckData == null) return;
+
+        GameManager.Instance.PuckCounts --;
+       // Debug.Log("UnPacked!" + GameManager.Instance.PuckCounts);
+
+        _equippedPucks.Remove(puckData);
     }
 
     public void RecalculateChangedPucks()
     {
-        //Debug.Log("Clearning Modifier before recalculation...");
+        _playerStat.ClearModlifiers();
 
-        _playerStat.ClearModlifiers(); // 기존 모디파이어 초기화
-        if (activePucks == null || activePucks.Length == 0)
-        {
-            Debug.LogWarning("No active pucks found. Skipping recalculation.");
-            return;
-        }
+        foreach (var puck in _equippedPucks)
+            _playerStat.AddModifiers(puck.modifiers);
 
-        //Debug.Log("Recalculating stats based on equipped pucks...");
-
-        foreach (var puck in activePucks)
-        {
-            if (puck != null)
-               _playerStat.AddModifiers(puck.modifiers);
-        }
-
-        _playerStat.Recalculate(); // 최종 재계산
+        _playerStat.Recalculate();
+        GetComponent<PlayerController>().RecalculatePlayerState();
     }
 
-
+    public IReadOnlyList<PuckData> GetEquippedPucks() => _equippedPucks;
 }

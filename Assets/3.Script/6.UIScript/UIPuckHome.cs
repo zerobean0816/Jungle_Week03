@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 
 public class UIPuckHome : MonoBehaviour, IDropHandler
 {
-
     public void OnDrop(PointerEventData eventData)
     {
         GameObject droppedObject = eventData.pointerDrag;
@@ -14,7 +13,7 @@ public class UIPuckHome : MonoBehaviour, IDropHandler
             // 1. Visuals: Return to the inventory layout
             puckItem.transform.SetParent(this.transform);
             
-            Debug.Log("Puck returned to Inventory.");
+            //Debug.Log("Puck returned to Inventory.");
         }
     }
 }

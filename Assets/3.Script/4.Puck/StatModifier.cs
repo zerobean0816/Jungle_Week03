@@ -6,7 +6,10 @@ public enum StatType
     AttackPower,
     MoveSpeed,
     AttackSpeed,
-    MaxStress
+    MaxStress,
+    BulletScale,
+    PlayerScale,
+    Accuracy
 }
 
 public enum ModifierType

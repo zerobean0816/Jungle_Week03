@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
 
-public class UIPuckItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class UIPuckItem : MonoBehaviour, 
+    IDragHandler, IBeginDragHandler, IEndDragHandler,
+    IPointerEnterHandler, IPointerExitHandler
 {
     public PuckData Puckdata;
     public GameObject Canvas;
-
+    public int OccupiedStartIndex = -1; // -1 = 인벤토리에 있음
+    [SerializeField] private TextMeshProUGUI _cardName;
 
     private PuckHandler _playerPuckHandler;
     private CanvasGroup _canvasGroup;
@@ -19,33 +23,48 @@ public class UIPuckItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDr
         }
 
         _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
+
+        _canvasGroup = GetComponent<CanvasGroup>();
+
+        if (_cardName != null && Puckdata != null)
+        {
+            _cardName.text = Puckdata.puckName;
+        }
+        else
+        {
+            Debug.LogWarning($"[UIPuckItem] : {gameObject.name}의 Text나 Data가 비어있습니다.");
+        }
     }
 
     public void Init()
     {
-        _canvasGroup = GetComponent<CanvasGroup>();
         _originalParent = transform.parent; // 원래 부모 저장
-
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        _originalParent = transform.parent; // 원래 부모 저장
-
-        UIPuckSlot sourceSlot = _originalParent.GetComponent<UIPuckSlot>();
+        // Check if we are being dragged OUT of a Slot
+        UIPuckSlotContainer sourceSlot = transform.parent.GetComponent<UIPuckSlotContainer>();
         if (sourceSlot != null)
         {
-            _playerPuckHandler.EquiedPuck(sourceSlot.GetSlotIndex(), null);
+            // Tell the handler to remove this puck data
+            _playerPuckHandler?.UnequipPuck(this.Puckdata); 
+            _playerPuckHandler?.RecalculateChangedPucks();
         }
 
+        // Existing Canvas logic...
         if (Canvas != null)
         {
             transform.SetParent(Canvas.transform);
-            transform.SetAsLastSibling(); // This forces it to the bottom of the list (TOP of the screen)
+            transform.SetAsLastSibling(); 
         }
 
-        _canvasGroup.blocksRaycasts = false; // 드래그 중에는 레이캐스트 차단 해제
-        _canvasGroup.alpha = 0.6f; // 드래그 중에는 반투명 처리
+        transform.SetParent(Canvas.transform);
+        transform.SetAsLastSibling();
+
+        _canvasGroup.blocksRaycasts = false;
+        _canvasGroup.alpha = 0.6f;
+        
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -67,5 +86,16 @@ public class UIPuckItem : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDr
 
         // This makes it "snap" to the center of the Slot or the Layout Group in Home
         transform.localPosition = Vector3.zero;
+    }
+
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        ToolTipUI.Instance.Show(Puckdata);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        ToolTipUI.Instance.Hide();
     }
 }

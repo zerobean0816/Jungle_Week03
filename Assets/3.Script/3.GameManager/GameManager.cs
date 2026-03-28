@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     public UnityEvent OnPuckPauseExit;
     public UnityEvent OnGameStateChanged;
 
-
+    public int PuckCounts;
 
     public static GameManager Instance;
 
@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("[GameManager] : Player GameObject with tag 'Player' not found in the scene.");
             }
         }
+
+        PuckCounts = 0;
     }
 
     private void OnEnable()
@@ -78,12 +80,18 @@ public class GameManager : MonoBehaviour
         {
             case GameState.Playing:
                 // 게임이 진행 중일 때의 로직
+
+                Player.GetComponent<PlayerStat>().stat.currentStress += Time.deltaTime;
+                    
                 break;
             case GameState.GameOver:
                 // 게임 오버 상태일 때의 로직
                 break;
             case GameState.PuckPaused:
                 // 게임이 일시정지 상태일 때의 로직
+                break;
+            case GameState.Paused:
+
                 break;
             case GameState.Win:
                 // 게임 승리 상태일 때의 로직
@@ -105,7 +113,7 @@ public class GameManager : MonoBehaviour
         if (GameState != GameState.Playing) return;
 
         GameState     = GameState.PuckPaused;
-        Time.timeScale   = .2f;
+        Time.timeScale   = .0f;
         OnPuckPauseEnter.Invoke();
     }
 

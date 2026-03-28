@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981468b876913304787d89ceefca757a, type: 3}
   m_Name: BigGun
   m_EditorClassIdentifier: Assembly-CSharp::PuckData
-  puckName: 
+  puckName: BigGun
   description: 
   icon: {fileID: 0}
   modifiers:
@@ -24,4 +24,7 @@ MonoBehaviour:
     isMultiplier: 1
   - stat: 3
     value: -0.5
+    isMultiplier: 1
+  - stat: 5
+    value: 0.2
     isMultiplier: 1

@@ -15,7 +15,11 @@ public class Stat
     public float baseAttackSpeed = 1f;
     public float baseMaxStress  = 100f;
 
-    // ───────────────────────────────
+    public float baseBulletScale = 1f;
+    public float basePlayerSclae = 1f;
+    public float baseAccuracy = 25f;
+
+    // ───────────────────────────────j
     // 현재값 (퍽 적용 후 실제 사용값)
     // Recalculate() 후 이 값을 읽을 것
     // ───────────────────────────────
@@ -24,6 +28,9 @@ public class Stat
     public float moveSpeed;
     public float attackSpeed;
     public float maxStress;
+    public float bulletScale;
+    public float playerSclae;
+    public float accuracy;
 
     // ───────────────────────────────
     // 런타임 상태값 (실시간으로 변하는 값)
@@ -50,6 +57,9 @@ public class Stat
         moveSpeed    = baseMoveSpeed;
         attackSpeed  = baseAttackSpeed;
         maxStress    = baseMaxStress;
+        bulletScale  = baseBulletScale;
+        playerSclae  = basePlayerSclae;
+        accuracy     = baseAccuracy;
         
         //Debug.Log("[Stat] : Recalculating stats...");
 
@@ -79,19 +89,28 @@ public class Stat
         switch (mod.stat)
         {
             case StatType.MaxHP:
-                maxHealth    = mod.isMultiplier ? maxHealth    * (1f + mod.value) : maxHealth    + mod.value;
+                maxHealth    = mod.isMultiplier ? maxHealth      * (1f + mod.value) : maxHealth    + mod.value;
                 break;
             case StatType.AttackPower:
-                damage       = mod.isMultiplier ? damage       * (1f + mod.value) : damage       + mod.value;
+                damage       = mod.isMultiplier ? damage         * (1f + mod.value) : damage       + mod.value;
                 break;
             case StatType.MoveSpeed:
-                moveSpeed    = mod.isMultiplier ? moveSpeed    * (1f + mod.value) : moveSpeed    + mod.value;
+                moveSpeed    = mod.isMultiplier ? moveSpeed      * (1f + mod.value) : moveSpeed    + mod.value;
                 break;
             case StatType.AttackSpeed:
-                attackSpeed  = mod.isMultiplier ? attackSpeed  * (1f + mod.value) : attackSpeed  + mod.value;
+                attackSpeed  = mod.isMultiplier ? attackSpeed    * (1f + mod.value) : attackSpeed  + mod.value;
                 break;
             case StatType.MaxStress:
-                maxStress    = mod.isMultiplier ? maxStress    * (1f + mod.value) : maxStress    + mod.value;
+                maxStress    = mod.isMultiplier ? maxStress      * (1f + mod.value) : maxStress    + mod.value;
+                break;
+            case StatType.BulletScale:
+                bulletScale    = mod.isMultiplier ? bulletScale  * (1f + mod.value) : bulletScale    + mod.value;
+                break;
+            case StatType.PlayerScale:
+                playerSclae    = mod.isMultiplier ? playerSclae  * (1f + mod.value) : playerSclae    + mod.value;
+                break;
+            case StatType.Accuracy:
+                maxStress    = mod.isMultiplier ? accuracy       * (1f + mod.value) : accuracy    + mod.value;
                 break;
         }
     }

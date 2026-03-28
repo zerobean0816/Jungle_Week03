@@ -3,10 +3,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Puck", menuName = "Puck System/Puck Data")]
 public class PuckData : ScriptableObject
 {
-    public string puckName; // 퍽 이름 
+    public string puckName;
     [TextArea]
-    public string description; // 퍽 설명 텍스트
-    public Sprite icon; // 퍽 아이콘 (선택적)
+    public string description;
+    public Sprite icon;
 
-    public StatModifier[] modifiers; // 퍽이 제공하는 모디파이어 배열
+    [Range(1, 10)]
+    public int size = 1; // ← 추가: 차지하는 슬롯 수
+
+    public StatModifier[] modifiers;
 }

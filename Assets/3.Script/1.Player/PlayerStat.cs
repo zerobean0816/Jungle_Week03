@@ -26,11 +26,12 @@ public class PlayerStat : MonoBehaviour
     public void Recalculate()
     {
         stat.Recalculate(_modifiers);
+        GetComponent<PlayerController>().RecalculatePlayerState();
     }
 
     public void AddModifiers(StatModifier[] modifiers)
     {
-        Debug.Log($"Adding {modifiers.Length} modifiers from equipped puck...");
+        //Debug.Log($"Adding {modifiers.Length} modifiers from equipped puck...");
         foreach (var mod in modifiers)
             _modifiers.Add(mod);
     }

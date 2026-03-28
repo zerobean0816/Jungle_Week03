@@ -39,7 +39,9 @@ public class PlayerController : MonoBehaviour, IDamaged
 
     // player state variables
     [SerializeField] private Vector3 _movement; // 이동 방향 벡터
-    [SerializeField] private bool _isAttacking; // 공격 중인지 여부
+    [SerializeField] private bool _isMousePressing; // 마우스 클릭 중인지
+    [SerializeField] private bool _isMouseReleased; // 마우스 릴리즈 중인지
+
     [SerializeField] private bool _hasChangedState; // 상태 변경 여부
     [SerializeField] private bool _spaceisPressed; // 스페이스바 입력 여부
 
@@ -78,9 +80,13 @@ public class PlayerController : MonoBehaviour, IDamaged
 
         if (_attackAction.triggered)
         {
-            
-            _isAttacking = true;
+            _isMousePressing = true;
         } // 공격 입력 여부 확인
+
+        if (_attackAction.WasReleasedThisFrame())
+        {
+            _isMouseReleased = true;
+        } // 공격 입력 릴리즈 여부 확인
 
         if (_spaceAction.triggered)
         {
@@ -124,11 +130,17 @@ public class PlayerController : MonoBehaviour, IDamaged
 
     void ActIdle()
     {
-        _playerAction.CallAttackOnPress(_isAttacking);
+        _playerAction.HandleAttackInput(_isMousePressing, _isMouseReleased);
         _playerAction.AimTowardsMouse2D();
 
         Vector3 move = new Vector3(_movement.x,_movement.y,0f) * _playerStat.stat.moveSpeed * Time.fixedDeltaTime; // 이동 방향과 속도 계산
         _rb.MovePosition(transform.position + move); // Rigidbody에 이동 적용
+
+        if (_isMouseReleased)
+        {
+            _isMousePressing = false; // 공격 입력 초기화
+            _isMouseReleased = false; // 공격 릴리즈 입력 초기화
+        }
     }
 
     void ActCrazy()
@@ -151,5 +163,10 @@ public class PlayerController : MonoBehaviour, IDamaged
         {
             GameManager.Instance.TriggerGameOver(); // 체력이 0 이하가 되면 사망 처리
         }
+    }
+
+    public void RecalculatePlayerState()
+    {
+        transform.localScale = new Vector3(_playerStat.stat.playerSclae, _playerStat.stat.playerSclae, 1f);
     }
 }
