@@ -91,12 +91,11 @@ public class GameManager : MonoBehaviour
             case GameState.MainMenu:
                 // 메인 메뉴 상태일 때의 로직   
                 break;
-                
+
              default:
                  Debug.LogWarning($"Unhandled GameState: {GameState}");
                  break;
         }
-
 
     }
 
@@ -106,7 +105,7 @@ public class GameManager : MonoBehaviour
         if (GameState != GameState.Playing) return;
 
         GameState     = GameState.PuckPaused;
-        Time.timeScale   = 0f;
+        Time.timeScale   = .2f;
         OnPuckPauseEnter.Invoke();
     }
 
@@ -147,8 +146,28 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex
         );
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+    }
+
+    public void QuitGame()
+    {
+        Debug.Log("Quit Game");
+        Application.Quit();
+    }
+
+    public void PauseGame()
+    {
+        if (GameState != GameState.Playing) return;
+
+        GameState = GameState.Paused;
+        Time.timeScale = 0f;
     }
 }
 
