@@ -22,12 +22,12 @@ public class PlayerStat : MonoBehaviour
     // 퍽 선택 시 → 미리보기만, 실제 적용 X
     public void PreviewModifiers(StatModifier[] modifiers)
     {
-        _pendingModifiers = new List<StatModifier>(Modifiers); // 현재 모디파이어 복사
+        _pendingModifiers = new List<StatModifier>(Modifiers);
         foreach (var mod in modifiers)
             _pendingModifiers.Add(mod);
 
         Stat preview = stat.GetPreview(_pendingModifiers);
-        OnPreviewStat?.Invoke(preview); // UI에 미리보기 전달
+        OnPreviewStat?.Invoke(preview);
     }
 
     // 퍽 확정 시 → 실제 적용
@@ -68,12 +68,13 @@ public class PlayerStat : MonoBehaviour
 
     public void EnterPuckPause()
     {
-        // 현재 HP 비율 스냅샷 저장
-        _savedHealthRatio = stat.maxHealth > 0f 
-            ? stat.currentHealth / stat.maxHealth 
-            : 1f;
+        _savedHealthRatio = stat.maxHealth > 0f
+        ? stat.currentHealth / stat.maxHealth
+        : 1f;
 
-        Stat preview = stat.GetPreview(Modifiers);
+        _pendingModifiers = new List<StatModifier>(Modifiers);
+
+        Stat preview = stat.GetPreview(_pendingModifiers);
         OnPreviewStat?.Invoke(preview);
     }
 }

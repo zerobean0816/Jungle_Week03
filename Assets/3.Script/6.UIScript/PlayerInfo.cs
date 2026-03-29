@@ -17,26 +17,13 @@ public class PlayerInfo : MonoBehaviour
         ShowPlayerStats();
     }
 
-    void OnEnable()
-    {
-        if (_playerStat == null) return;
-
-        // 패널이 열릴 때 PuckPause 중이면 미리보기, 아니면 실제 스탯 표시
-        if (GameManager.Instance.GameState == GameState.PuckPaused)
-        {
-            Stat preview = _playerStat.stat.GetPreview(_playerStat.Modifiers);
-            ShowPreviewStats(preview);
-        }
-        else
-        {
-            ShowPlayerStats();
-        }
-    }
 
     void OnDestroy()
     {
-        _playerStat.OnStatChanged  -= ShowPlayerStats;
-        _playerStat.OnPreviewStat  -= ShowPreviewStats;
+        if (_playerStat == null) return;
+    
+        _playerStat.OnStatChanged -= ShowPlayerStats;
+        _playerStat.OnPreviewStat -= ShowPreviewStats;
     }
 
     // 미리보기 — 임시 Stat을 받아서 표시

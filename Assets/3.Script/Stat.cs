@@ -10,9 +10,9 @@ public class Stat
     // 퍽/상태이상 없는 순수 기본 수치
     // ───────────────────────────────
     public float baseHealth     = 100f;
-    public float baseDamage     = 10f;
-    public float baseMoveSpeed  = 7f;
-    public float baseAttackSpeed = 1f;
+    public float baseDamage     = 15f;
+    public float baseMoveSpeed  = 13f;
+    public float baseAttackSpeed = 2f;
     public float baseMaxStress  = 100f;
 
     public float baseBulletScale = 1f;

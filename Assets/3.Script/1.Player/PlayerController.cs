@@ -157,20 +157,23 @@ public class PlayerController : MonoBehaviour, IDamaged
     {
         if (GameManager.Instance.GameState != GameState.Playing)
         {
-            _rb.linearVelocity = Vector3.zero; // 완전히 멈춤
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
             return;
         }
 
         _playerAction.HandleAttackInput(_isMousePressing, _isMouseReleased);
         _playerAction.AimTowardsMouse2D();
 
-        Vector3 move = new Vector3(_movement.x,_movement.y,0f) * _playerStat.stat.moveSpeed * Time.fixedDeltaTime; // 이동 방향과 속도 계산
-        _rb.MovePosition(transform.position + move); // Rigidbody에 이동 적용
+        Vector3 targetVelocity = new Vector3(_movement.x, _movement.y, 0f) * _playerStat.stat.moveSpeed;
+
+        // ✅ 부드럽게 속도 보간
+        _rb.linearVelocity = Vector3.Lerp(_rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * 20f);
 
         if (_isMouseReleased)
         {
-            _isMousePressing = false; // 공격 입력 초기화
-            _isMouseReleased = false; // 공격 릴리즈 입력 초기화
+            _isMousePressing = false;
+            _isMouseReleased = false;
         }
     }
 
@@ -198,6 +201,12 @@ public class PlayerController : MonoBehaviour, IDamaged
 
     public void RecalculatePlayerState()
     {
+        transform.localScale = new Vector3(
+        _playerStat.stat.playerScale,
+        _playerStat.stat.playerScale,
+        1f
+        );
+
         _previousScaleValue = _playerStat.stat.playerScale;
     }
 }
