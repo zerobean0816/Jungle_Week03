@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: LuckyBicky
   m_EditorClassIdentifier: Assembly-CSharp::PuckData
   puckName: "\uB7ED\uD0A4\uBE44\uD0A4"
-  description: 
+  description: "\uC5B8\uC81C\uB098 \uB7ED\uD0A4\uBE44\uD0A4"
   icon: {fileID: 0}
+  size: 1
   modifiers:
   - stat: 0
     value: 50
@@ -23,8 +24,11 @@ MonoBehaviour:
     value: 0.2
     isMultiplier: 1
   - stat: 2
-    value: 0.2
+    value: 0.1
     isMultiplier: 1
   - stat: 4
-    value: 0.5
+    value: 1
+    isMultiplier: 1
+  - stat: 7
+    value: -0.4
     isMultiplier: 1

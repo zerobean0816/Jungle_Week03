@@ -11,5 +11,7 @@ public class PuckData : ScriptableObject
     [Range(1, 10)]
     public int size = 1; // ← 추가: 차지하는 슬롯 수
 
+    public bool _isNegative;
+
     public StatModifier[] modifiers;
 }

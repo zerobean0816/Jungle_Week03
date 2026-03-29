@@ -6,9 +6,6 @@ public static class PuckDataFormatter
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.AppendLine(data.description);
-        sb.AppendLine();
-
         foreach (var mod in data.modifiers)
             sb.AppendLine(FormatModifier(mod));
 
@@ -20,17 +17,19 @@ public static class PuckDataFormatter
         string statName = GetStatName(mod.stat);
         string sign     = mod.value >= 0 ? "+" : "";
 
+        string value;
         if (mod.isMultiplier)
         {
-            // ex) 이동속도 +10%
             float percent = mod.value * 100f;
-            return $"{statName} {sign}{percent:0.#}%";
+            value = $"{sign}{percent:0.#}%";
         }
         else
         {
-            // ex) 최대 체력 +20
-            return $"{statName} {sign}{mod.value:0.#}";
+            value = $"{sign}{mod.value:0.#}";
         }
+
+        string color = mod.value >= 0 ? "#4FC3F7" : "#EF9A9A"; // 파란색 / 빨간색
+        return $"{statName} <color={color}>{value}</color>";
     }
 
     private static string GetStatName(StatType stat)
@@ -45,6 +44,10 @@ public static class PuckDataFormatter
             StatType.BulletScale  => "탄환 크기",
             StatType.PlayerScale  => "플레이어 크기",
             StatType.Accuracy     => "정확도",
+            StatType.HPRegen         => "체력 재생",
+            StatType.StressRegen     => "스트레스 증가",
+            StatType.StressPerDamage => "피격 스트레스",
+            StatType.DamageReceived  => "받는 데미지",
             _                     => stat.ToString()
         };
     }

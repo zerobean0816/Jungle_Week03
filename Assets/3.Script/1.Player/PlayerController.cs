@@ -42,9 +42,10 @@ public class PlayerController : MonoBehaviour, IDamaged
     [SerializeField] private bool _isMousePressing; // 마우스 클릭 중인지
     [SerializeField] private bool _isMouseReleased; // 마우스 릴리즈 중인지
 
-    [SerializeField] private bool _hasChangedState; // 상태 변경 여부
+
     [SerializeField] private bool _spaceisPressed; // 스페이스바 입력 여부
 
+    private float _previousScaleValue = 1f;
 
     private Camera _mainCamera; // 메인 카메라 참조
 
@@ -64,7 +65,6 @@ public class PlayerController : MonoBehaviour, IDamaged
         _attackAction = _playerInput.actions["Attack"]; // PlayerMove에서 공격 입력 액션 가져오기
         _spaceAction = _playerInput.actions["Jump"]; // PlayerMove에서 스페이스바 입력 액션 가져오기    
 
-        _hasChangedState = true;
 
         CurrentState = PlayerState.Idle; // 초기 상태 설정
         _lastState = CurrentState;
@@ -75,27 +75,36 @@ public class PlayerController : MonoBehaviour, IDamaged
 
     void Update()
     {
-        // PlayerMove 컴포넌트에서 이동 방향과 속도를 가져와서 Rigidbody에 적용
+        ReadInputs();
+
+         _playerAction.PerformSkill(ref _spaceisPressed);
+
+        if (GameManager.Instance.GameState == GameState.PuckPaused)
+        {
+            _movement = Vector3.zero;
+            return;
+        }
+        
         _movement = _moveAction.ReadValue<Vector2>(); // PlayerMove에서 이동 방향 가져오기
 
-        if (_attackAction.triggered)
+        //Debug.Log("PlayerMoveInput: " + _movement);
+
+       if (GameManager.Instance.GameState == GameState.Playing)
         {
-            _isMousePressing = true;
-        } // 공격 입력 여부 확인
+            // 초당 체력 회복
+            if (_playerStat.stat.currentHealth < _playerStat.stat.maxHealth)
+            {
+                _playerStat.stat.currentHealth += _playerStat.stat.hpRegen * Time.deltaTime;
+            }
 
-        if (_attackAction.WasReleasedThisFrame())
+            // 초당 스트레스 증가
+            _playerStat.stat.currentStress += _playerStat.stat.stressRegen * Time.deltaTime;
+        }
+
+        if (_playerStat.stat.currentStress >= _playerStat.stat.maxStress)
         {
-            _isMouseReleased = true;
-        } // 공격 입력 릴리즈 여부 확인
-
-        if (_spaceAction.triggered)
-        {
-            
-            _spaceisPressed = true;
-        } // 스페이스바 입력 여부 확인
-
-        _playerAction.PerformSkill(ref _spaceisPressed);
-
+            // Add stress Generation here
+        }
     }
 
     void FixedUpdate()
@@ -103,7 +112,6 @@ public class PlayerController : MonoBehaviour, IDamaged
         // 상태가 변경되었는지 확인
         if (CurrentState != _lastState)
         {
-            _hasChangedState = false;
             _lastState = CurrentState;
         }
 
@@ -125,11 +133,34 @@ public class PlayerController : MonoBehaviour, IDamaged
                 break;
         }
 
-        _hasChangedState = true;
+    }
+
+    void ReadInputs()
+    {
+        if (_attackAction.triggered)
+        {
+            _isMousePressing = true;
+        } // 공격 입력 여부 확인
+
+        if (_attackAction.WasReleasedThisFrame())
+        {
+            _isMouseReleased = true;
+        } // 공격 입력 릴리즈 여부 확인
+
+        if (_spaceAction.triggered)
+        {
+            _spaceisPressed = true;
+        } // 스페이스바 입력 여부 확인
     }
 
     void ActIdle()
     {
+        if (GameManager.Instance.GameState != GameState.Playing)
+        {
+            _rb.linearVelocity = Vector3.zero; // 완전히 멈춤
+            return;
+        }
+
         _playerAction.HandleAttackInput(_isMousePressing, _isMouseReleased);
         _playerAction.AimTowardsMouse2D();
 
@@ -157,16 +188,16 @@ public class PlayerController : MonoBehaviour, IDamaged
 
     public void TakeDamage(float damageAmount)
     {
-        _playerStat.stat.currentHealth -= damageAmount; // 체력 감소
+        float finalDamage = damageAmount * _playerStat.stat.damageReceived; // 배율 적용
+        _playerStat.stat.currentHealth -= finalDamage;
+        _playerStat.stat.currentStress += _playerStat.stat.stressPerDamage; // 피격 스트레스
 
         if (_playerStat.stat.currentHealth <= 0)
-        {
-            GameManager.Instance.TriggerGameOver(); // 체력이 0 이하가 되면 사망 처리
-        }
+            GameManager.Instance.TriggerGameOver();  // 체력이 0 이하가 되면 사망 처리
     }
 
     public void RecalculatePlayerState()
     {
-        transform.localScale = new Vector3(_playerStat.stat.playerSclae, _playerStat.stat.playerSclae, 1f);
+        _previousScaleValue = _playerStat.stat.playerScale;
     }
 }

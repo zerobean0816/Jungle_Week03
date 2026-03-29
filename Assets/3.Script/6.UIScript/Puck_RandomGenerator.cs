@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Puck_RandomGenerator : MonoBehaviour
 {
-    public List<PuckData> puckDataList; // List of all possible puck data
     [SerializeField] GameObject PuckUIContainer; // Parent container for the generated puck UI elements
 
     public int puckCount = 5; // Number of pucks to generate
@@ -41,8 +40,8 @@ public class Puck_RandomGenerator : MonoBehaviour
 
         for (int i = 0; i < puckCount; i++)
         {
-            int randomIndex = Random.Range(0, puckDataList.Count);
-            PuckData randomPuckData = puckDataList[randomIndex];
+            int randomIndex = Random.Range(0, GameManager.Instance.PuckDatas.Count);
+            PuckData randomPuckData = GameManager.Instance.PuckDatas[randomIndex];
             newPuckCard = Instantiate(cardPerfab, Vector3.zero, Quaternion.identity);
             newPuckCard.transform.SetParent(this.transform, false); // Set parent to the current GameObject (UI container)
             newPuckCard.SetActive(true); // Ensure the card is active

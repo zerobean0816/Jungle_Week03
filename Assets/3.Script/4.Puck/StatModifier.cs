@@ -9,7 +9,11 @@ public enum StatType
     MaxStress,
     BulletScale,
     PlayerScale,
-    Accuracy
+    Accuracy,
+    HPRegen,          // 초당 체력 회복
+    StressRegen,      // 초당 스트레스 증가
+    StressPerDamage,  // 피격 시 스트레스 증가량
+    DamageReceived 
 }
 
 public enum ModifierType

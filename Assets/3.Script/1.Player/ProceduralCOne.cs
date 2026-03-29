@@ -14,7 +14,6 @@ public class ProceduralCone : MonoBehaviour
     {
         _meshFilter = GetComponent<MeshFilter>();
         _mesh = new Mesh();
-        _mesh.name = "ProceduralAimCone";
         _meshFilter.mesh = _mesh;
     }
 

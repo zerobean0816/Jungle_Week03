@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -19,7 +20,7 @@ public class GameManager : MonoBehaviour
             if (_gameState == value) return; // 같은 상태면 무시
 
             _gameState = value;
-            Debug.Log($"Game State changed to: {_gameState}");
+            Debug.Log($"[GameManager] : Game State changed to: {_gameState}");
             OnGameStateChanged?.Invoke(); // 변경 시에만 발생
         }
     }
@@ -31,9 +32,16 @@ public class GameManager : MonoBehaviour
     public UnityEvent OnPuckPauseExit;
     public UnityEvent OnGameStateChanged;
 
+
     public int PuckCounts;
 
+    public List<PuckData> PuckDatas;
+    public List<PuckData> StressPuckData;
+
     public static GameManager Instance;
+
+
+
 
     private void Awake()
     {
@@ -55,7 +63,7 @@ public class GameManager : MonoBehaviour
             Player = GameObject.FindGameObjectWithTag("Player");
             if (Player == null)
             {
-                Debug.LogError("[GameManager] : Player GameObject with tag 'Player' not found in the scene.");
+                Debug.LogWarning("[GameManager] : Player GameObject with tag 'Player' not found in the scene.");
             }
         }
 
@@ -111,7 +119,8 @@ public class GameManager : MonoBehaviour
     public void EnterPuckPause()
     {
         if (GameState != GameState.Playing) return;
-
+        Player.GetComponent<PlayerStat>().EnterPuckPause();
+        
         GameState     = GameState.PuckPaused;
         Time.timeScale   = .0f;
         OnPuckPauseEnter.Invoke();
@@ -123,6 +132,8 @@ public class GameManager : MonoBehaviour
         if (GameState != GameState.PuckPaused) return;
 
         GameState     = GameState.Playing;
+        Player.GetComponent<PlayerStat>().ConfirmModifiers();
+
         Time.timeScale   = 1f;
         OnPuckPauseExit.Invoke();
     }

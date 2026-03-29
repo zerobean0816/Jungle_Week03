@@ -2,32 +2,41 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab; // 스폰할 적 프리팹
-    public Transform[] spawnPoints; // 적이 스폰될 위치들
-    public float spawnInterval = 5f; // 적이 스폰되는 간격
+    public enum SpawnMode { Aggressive, NeutralPack }
+    
+    public SpawnMode mode;
+    public GameObject enemyPrefab;
+    public int count = 5;
+    public float radius = 10f;
 
-    private float timer;
-
-    void Update()
+    void Start()
     {
-        timer += Time.deltaTime;
-
-        if (timer >= spawnInterval)
+        // Create a group container if we are in NeutralPack mode
+        EnemyGroup group = null;
+        if (mode == SpawnMode.NeutralPack)
         {
-            SpawnEnemy();
-            timer = 0f;
+            GameObject groupObj = new GameObject("EnemyGroup_Instance");
+            group = groupObj.AddComponent<EnemyGroup>();
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 spawnPos = transform.position + (Random.insideUnitSphere * radius);
+            spawnPos.z = 0; // Keep it 2D if necessary
+
+            GameObject go = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+            EnemyController controller = go.GetComponent<EnemyController>();
+
+            if (mode == SpawnMode.Aggressive)
+            {
+                controller.CurrentState = EnemyState.Chase;
+            }
+            else
+            {
+                controller.CurrentState = EnemyState.Idle;
+                // Assign this enemy to the group
+                controller.AssignToGroup(group); 
+            }
         }
     }
-
-    void SpawnEnemy()
-    {
-        if (spawnPoints.Length == 0 || enemyPrefab == null)
-            return;
-
-        int randomIndex = Random.Range(0, spawnPoints.Length);
-        Transform spawnPoint = spawnPoints[randomIndex];
-
-        Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
-    }
-
 }

@@ -5,11 +5,12 @@ using UnityEngine.InputSystem;
 
 public class ToolTipUI : MonoBehaviour
 {
-public static ToolTipUI Instance;
+    public static ToolTipUI Instance;
 
     [SerializeField] private GameObject _tooltipPanel;
     [SerializeField] private TextMeshProUGUI _nameText;
-    [SerializeField] private TextMeshProUGUI _descText;
+    [SerializeField] private TextMeshProUGUI _descriptionText;
+    [SerializeField] private TextMeshProUGUI _statShowText;
     
     private Canvas _parentCanvas; // Drag your Main Canvas here
     private RectTransform _rect;
@@ -59,7 +60,8 @@ public static ToolTipUI Instance;
     {
         _tooltipPanel.SetActive(true);
         _nameText.text = data.puckName;
-        _descText.text = PuckDataFormatter.Format( data); // Example
+        _descriptionText.text = data.description;
+        _statShowText.text = PuckDataFormatter.Format( data); // Example
         
         // Move it immediately so it doesn't "jump" from the last position
         UpdatePosition();

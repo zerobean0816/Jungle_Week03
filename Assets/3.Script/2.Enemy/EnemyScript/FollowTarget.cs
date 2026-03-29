@@ -8,34 +8,33 @@ public class FollowTarget : MonoBehaviour
     public Vector3 targetPosition;
     public float stoppingDistance = 0.5f;
 
-    void Start()
+    void Awake()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        // navMeshAgent.updateRotation = false;
         
         if (navMeshAgent == null)
         {
-            Debug.LogError("NavMeshAgent component not found on this GameObject!");
+            Debug.LogError("[FollowTarget] : NavMeshAgent component not found on this GameObject!");
         }
     }
 
     void Update()
     {
         if (navMeshAgent == null || !navMeshAgent.isOnNavMesh)
-            return;
+        return;
 
-        // If there's a target transform, follow it
         if (targetTransform != null)
-        {
             navMeshAgent.SetDestination(targetTransform.position);
-        }
-        // Otherwise, follow the set target position
         else if (targetPosition != Vector3.zero)
-        {
             navMeshAgent.SetDestination(targetPosition);
-        }
 
-        transform.rotation = Quaternion.Euler(0,0,0);
+        // ✅ 이동 방향으로 회전
+        if (navMeshAgent.velocity.sqrMagnitude > 0.01f)
+        {
+            Vector2 dir = new Vector2(navMeshAgent.velocity.x, navMeshAgent.velocity.y);
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        }
     }
 
     // Public method to set a new target position
@@ -63,6 +62,11 @@ public class FollowTarget : MonoBehaviour
             return false;
 
         return !navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f;
+    }
+
+    public void SetFollowerSpeed(float moveSpeed)
+    {
+        navMeshAgent.speed = moveSpeed;
     }
 }
 

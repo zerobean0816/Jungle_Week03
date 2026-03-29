@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
@@ -8,6 +9,7 @@ public class UIPuckItem : MonoBehaviour,
 {
     public PuckData Puckdata;
     public GameObject Canvas;
+    public Image Image;
     public int OccupiedStartIndex = -1; // -1 = 인벤토리에 있음
     [SerializeField] private TextMeshProUGUI _cardName;
 
@@ -16,16 +18,35 @@ public class UIPuckItem : MonoBehaviour,
     private Transform _originalParent;
 
     public void Start()
+    {   
+        // Check if player is null
+        CheckPlayerReference();
+
+        Image = GetComponent<Image>();
+        _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+
+        ChangePuckItemName();
+
+        ChangeColorByType();
+    }
+
+    public void Init()
+    {
+        _originalParent = transform.parent; // 원래 부모 저장
+    }
+
+    void CheckPlayerReference()
     {
         if (GameManager.Instance.Player == null)
         {
             Debug.LogError("[UIPuckItem] : Player GameObject not found in the scene.");
         }
+    }
 
-        _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
-
-        _canvasGroup = GetComponent<CanvasGroup>();
-
+    void ChangePuckItemName()
+    {
+        // Set Puck Name By its puck
         if (_cardName != null && Puckdata != null)
         {
             _cardName.text = Puckdata.puckName;
@@ -36,9 +57,12 @@ public class UIPuckItem : MonoBehaviour,
         }
     }
 
-    public void Init()
+    void ChangeColorByType()
     {
-        _originalParent = transform.parent; // 원래 부모 저장
+        if (Puckdata._isNegative)
+        {
+            Image.color = Color.red;
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)

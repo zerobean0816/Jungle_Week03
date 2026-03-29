@@ -1,28 +1,39 @@
-using Unity.VisualScripting;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerAction : MonoBehaviour
 {
     private Camera _mainCamera;
 
+
     [Header("Gun Settings")]
     [SerializeField] private float _maxAimRadius = 5f; // 마우스 조준 최대 반경
     [SerializeField] private GameObject _bulletPrefab; // 발사할 총알 프리팹 참조
-    [SerializeField] private GameObject _coneVisual;
-    [SerializeField] private Transform _firePoint;
+
 
     [Header("Aim Visuals")]
     [SerializeField] private ProceduralCone _coneVisualizer; // Drag the child object here
     [SerializeField] private float _currentRange = 5f; // Add range if you want it variable
-
+    [SerializeField] private Transform _meshTransfrom;
 
     [SerializeField] private Stat _playerStat;
+
+    [SerializeField] private bool _reloadIsComplete;
+     private Coroutine _reloadCoroutine;
+
+    private float _reloadTimer = 0f;
+    private float _reloadDuration = 1f;
+
+    const float MAXSPREADANGLE = 50f;
+    [SerializeField] private float currentSpread;
 
     void Start()
     {
         _mainCamera = Camera.main; // 메인 카메라 자동 참조
         _playerStat = GameManager.Instance.Player.GetComponent<PlayerStat>().stat;
+        _reloadIsComplete = true;
     }
 
     // Player Puck System Staty / End commend.
@@ -47,13 +58,15 @@ public class PlayerAction : MonoBehaviour
     {
         // GetMouse Position in local space
         Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
-
         float distanceFromCamera = Mathf.Abs(_mainCamera.transform.position.z - transform.position.z);
-
         Vector3 mouseWorldPos = _mainCamera.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, distanceFromCamera));
 
         // 3. Create the Direction Vector (X and Y only)
         Vector2 direction = (Vector2)mouseWorldPos - (Vector2)transform.position;
+
+        currentSpread = MAXSPREADANGLE *(1f - _playerStat.accuracy/ 100f);
+        currentSpread = Mathf.Clamp(currentSpread, 0f, MAXSPREADANGLE); // Keep it safe
+
 
         // 4. THE TETHER: Clamp the distance so the player doesn't have to move the mouse "dramatically"
         if (direction.magnitude > _maxAimRadius)
@@ -63,45 +76,64 @@ public class PlayerAction : MonoBehaviour
 
 
         // Draw Cone based on Spread
-         _coneVisualizer.DrawCone(_playerStat.accuracy * 2f, _currentRange); 
+         _coneVisualizer.DrawCone(currentSpread * 2f, _currentRange); 
 
         // 5. Apply Rotation (Rotate around Z axis for 2D)
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+        _meshTransfrom.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // Optional: Visualize the tethered aim point in the Scene view
-        Debug.DrawRay(transform.position, direction * 10f, Color.green);
     }
 
     public void HandleAttackInput(bool isPressing, bool isReleased)
     {
-        if (isPressing)
+        if (isPressing && _reloadIsComplete)
         {
-           FireBullet();
+            FireBullet();
+            StartReload();
         }
-        
+    }
 
-        // 시각적으로 부채꼴 그리기 (디버그용)
-        DrawVisualAim();
+    private void StartReload()
+    {
+        if (_reloadCoroutine != null)
+            StopCoroutine(_reloadCoroutine);
+
+        _reloadCoroutine = StartCoroutine(ReloadRoutine());
+    }
+
+    public float GetReloadProgress()
+    {
+        if (_reloadIsComplete) return 1f;
+        return _reloadTimer / _reloadDuration;
+    }
+
+    private IEnumerator ReloadRoutine()
+    {
+        _reloadDuration = 1f / _playerStat.attackSpeed;
+        _reloadTimer = 0f;
+        _reloadIsComplete = false;
+
+        while (_reloadTimer < _reloadDuration)
+        {
+            _reloadTimer += Time.deltaTime;
+            yield return null; // ✅ WaitForSeconds 대신 매 프레임 업데이트
+        }
+
+        _reloadIsComplete = true;
     }
 
     private void FireBullet()
-    {
-        // 현재 조준 각도 내에서 랜덤한 오차 적용
-        float randomOffset = Random.Range(-_playerStat.accuracy, _playerStat.accuracy);
-        Quaternion fireRotation = transform.rotation * Quaternion.Euler(0, 0, randomOffset);
+    { // Maximum possible spread in degrees at 0 accuracy
+        float randomOffset = (Random.Range(-currentSpread, currentSpread)
+                        + Random.Range(-currentSpread, currentSpread)) / 2f;
+
+        Quaternion fireRotation = _meshTransfrom.rotation * Quaternion.Euler(0, 0, randomOffset);
         
+        float offsetDistance = 2.0f; 
+        Vector3 firePoint = _meshTransfrom.position + (_meshTransfrom.right * offsetDistance);
 
-        Instantiate(_bulletPrefab, _firePoint.position, fireRotation);
-    }
+        Instantiate(_bulletPrefab, firePoint, fireRotation);
 
-    private void DrawVisualAim()
-    {
-        // 부채꼴의 양 끝 선을 Scene 뷰에 그림
-        Vector3 leftBound = Quaternion.Euler(0, 0, _playerStat.accuracy) * transform.right;
-        Vector3 rightBound = Quaternion.Euler(0, 0, -_playerStat.accuracy) * transform.right;
-
-        Debug.DrawRay(transform.position, leftBound * _maxAimRadius, Color.red);
-        Debug.DrawRay(transform.position, rightBound * _maxAimRadius, Color.red);
+        _bulletPrefab.GetComponent<Bullet>().Damage = _playerStat.damage;
     }
 }

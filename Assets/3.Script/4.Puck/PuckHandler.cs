@@ -41,7 +41,7 @@ public class PuckHandler : MonoBehaviour
 
     public void RecalculateChangedPucks()
     {
-        _playerStat.ClearModlifiers();
+        _playerStat.ClearModifiers();
 
         foreach (var puck in _equippedPucks)
             _playerStat.AddModifiers(puck.modifiers);
