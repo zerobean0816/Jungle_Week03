@@ -8,7 +8,7 @@ public class FloatingTextSpawner : MonoBehaviour
 
     [Header("Pool Settings")]
     [SerializeField] private GameObject textPrefab; // Drag your FloatingText prefab here
-    [SerializeField] private int _poolSize = 5; // How many to create at the start
+    [SerializeField] private int _poolSize = 15; // How many to create at the start
 
     private int _poolIndex = 0;
 
@@ -53,7 +53,7 @@ public class FloatingTextSpawner : MonoBehaviour
         
         // Call your looping pool function here!
         PoolText( "- " +damage.ToString("F0"), orangeRed, position);
-        Debug.Log(position);
+        //Debug.Log(position);
     }
 
 
@@ -74,7 +74,7 @@ public class FloatingTextSpawner : MonoBehaviour
     }
 
     // 3. The main method called by your Player or Enemy scripts
-    public void PoolText(string message, Color color, Vector3 _position)
+    public void PoolText(string message, Color color, Vector3 _position , float scale = 1f)
     {
        GameObject root = _pooledTexts[_poolIndex];
         if (root == null) return;
@@ -88,6 +88,12 @@ public class FloatingTextSpawner : MonoBehaviour
         FloatingText floatingText = root.GetComponentInChildren<FloatingText>();
         if (floatingText != null)
             floatingText.SetTextData(message, color);
+
+        if (scale < 0.1f)
+        {
+            scale = 0.1f;
+        }
+        root.transform.localScale *= scale;
 
         root.SetActive(true); // ← OnEnable fires here, position is already correct
 

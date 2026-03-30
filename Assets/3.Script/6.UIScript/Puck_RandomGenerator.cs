@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Puck_RandomGenerator : MonoBehaviour
@@ -35,21 +35,17 @@ public class Puck_RandomGenerator : MonoBehaviour
 
     public void SpawnRandomPuck()
     {
-        GameObject newPuckCard;
-        UIPuckItem puckItem;
-
         for (int i = 0; i < puckCount; i++)
         {
             int randomIndex = Random.Range(0, GameManager.Instance.PuckDatas.Count);
             PuckData randomPuckData = GameManager.Instance.PuckDatas[randomIndex];
-            newPuckCard = Instantiate(cardPerfab, Vector3.zero, Quaternion.identity);
-            newPuckCard.transform.SetParent(this.transform, false); // Set parent to the current GameObject (UI container)
-            newPuckCard.SetActive(true); // Ensure the card is active
 
-            puckItem = newPuckCard.GetComponent<UIPuckItem>();
-            puckItem.Canvas = PuckUIContainer; // Set the Canvas reference for the card
-            newPuckCard.GetComponent<UIPuckItem>().Init();
-            puckItem.Puckdata = randomPuckData;
+            GameObject newPuckCard = Instantiate(cardPerfab, Vector3.zero, Quaternion.identity);
+            newPuckCard.transform.SetParent(this.transform, false);
+
+            UIPuckItem puckItem = newPuckCard.GetComponent<UIPuckItem>();
+            puckItem.Canvas = PuckUIContainer;
+            puckItem.Init(randomPuckData); // ← pass data directly, set and init in one step
         }
     }
 }

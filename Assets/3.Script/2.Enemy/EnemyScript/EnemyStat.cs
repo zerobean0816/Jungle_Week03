@@ -28,34 +28,34 @@ public class EnemyStat : MonoBehaviour
 
     void SetStatTypeNormal()
     {
-        stat.baseHealth = 50f;
-        stat.baseMoveSpeed = 15f;
-        stat.basePlayerScale = 1.8f;
+        stat.baseHealth = 45f;
+        stat.baseMoveSpeed = 18f;
+        stat.basePlayerScale = 2f;
         stat.baseDamage = 8f;
         stat.baseAttackSpeed = 20f;
-        stat.basePlayerScale = 1.8f;
+;
         stat.ResetByChange();
     }
 
     void SetStatTypeEpic()
     {
-        stat.baseHealth = 200f;
-        stat.baseMoveSpeed = 10f;
-        stat.basePlayerScale = 3f;
-        stat.baseDamage = 12f;
+        stat.baseHealth = 190f;
+        stat.baseMoveSpeed = 11f;
+        stat.basePlayerScale = 4.2f;
+        stat.baseDamage = 13f;
         stat.baseAttackSpeed = 15f;
-        stat.basePlayerScale = 2.2f;
+
         stat.ResetByChange();
     }
 
     void SetStatTypeStocker()
     {
-        stat.baseHealth = 30f;
-        stat.baseMoveSpeed = 20f;
+        stat.baseHealth = 25f;
+        stat.baseMoveSpeed = 28f;
         stat.basePlayerScale = 1.4f;
-        stat.baseDamage = 4f;
-        stat.baseAttackSpeed = 30f;
-        stat.basePlayerScale = 1.5f;
+        stat.baseDamage = 5f;
+        stat.baseAttackSpeed = 25f;
+
         stat.ResetByChange();
     }
 }

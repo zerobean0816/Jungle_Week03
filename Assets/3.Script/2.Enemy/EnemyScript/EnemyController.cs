@@ -48,6 +48,11 @@ public class EnemyController : MonoBehaviour, IDamaged
     
     void Start()
     {
+        InitEnemy();
+    }
+
+    public void InitEnemy()
+    {
         _enemyStat = GetComponent<EnemyStat>();
         _enemyAction = GetComponent<EnemyAction>();
         _targetTracker = GetComponent<FollowTarget>();
@@ -55,22 +60,31 @@ public class EnemyController : MonoBehaviour, IDamaged
 
         _enemyAction.CallStart();
         _enemyAction.SetCurrentAttackType(AttackType);
-        _enemyAction.SetupAttackType();
+        
+        // Fetch the player actively right here
+        _player = GameObject.FindGameObjectWithTag("Player");
+
+        if (_player != null)
+        {
+            // Now that we have a player, we can safely grab its scale or stats!
+            float scaler = _enemyStat.stat.playerScale; 
+            transform.localScale = new Vector3(scaler, scaler, 1f);
+            
+            _enemyAction.SetupAttackType(scaler); 
+            _targetTracker.SetTargetTransform(_player.transform);
+            _textPosition = transform.position + new Vector3(0, scaler + 1, 0);
+        }
+        else
+        {
+            Debug.LogWarning($"[EnemyController] No Player found on scene restart for {gameObject.name}");
+        }
+
+        _enemySprite.CallStart();
         _enemyAction.SetupIdle();
 
-
-        _player = GameManager.Instance.Player;
-
         _targetTracker.enabled = false;
-        _targetTracker.SetTargetTransform(_player.transform);
         _targetTracker.SetFollowerSpeed(_enemyStat.stat.moveSpeed);
-
-        float scaler = _enemyStat.stat.playerScale; // Watch out for this name referencing 'player'!
-        transform.localScale = new Vector3(scaler, scaler, 1f);
-
-        _textPosition = transform.position + new Vector3(0,scaler + 1,0);
     }
-
 
     void Update()
     {
@@ -163,7 +177,7 @@ public class EnemyController : MonoBehaviour, IDamaged
 
         _enemyAction.TickAttack(_player,bullet);
 
-        if (_distBWPlayer > _targetTracker.stoppingDistance + 2f)
+        if (_distBWPlayer > _targetTracker.stoppingDistance + 6f)
         {
             CurrentState = EnemyState.Chase;
         }
@@ -178,6 +192,17 @@ public class EnemyController : MonoBehaviour, IDamaged
     void OnDead()
     {
         _targetTracker.enabled = false;
+
+        int pointGiven = Type switch
+        {
+            EnemyType.Epic    => 6,
+            EnemyType.Normal  => 2,
+            EnemyType.Stocker => 1,
+            _                 => 0
+        };
+
+        GameManager.Instance.EarnPoints(pointGiven);
+        AlertMySystem();
         Destroy(gameObject);
     }
 

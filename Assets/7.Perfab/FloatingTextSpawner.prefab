@@ -45,4 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloatingTextSpawner
   textPrefab: {fileID: 4061548879685066579, guid: cc4b2c56146b2a1469ee080921b27667, type: 3}
-  _poolSize: 12
+  _poolSize: 10

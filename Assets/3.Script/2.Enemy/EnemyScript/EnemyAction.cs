@@ -19,7 +19,7 @@ public class EnemyAction : MonoBehaviour
 
     [Header("Attack Settings")]
     [SerializeField] private float _attackCooldown = 1.5f;
-    [SerializeField] private float _meleeLingerduration = 0.5f;
+    [SerializeField] private float _meleeLingerduration = 0.3f;
 
     [Header("Idle Movement Settings")]
     [SerializeField] private float _idleMoveSpeed = 2f;
@@ -37,6 +37,8 @@ public class EnemyAction : MonoBehaviour
     private bool _isMovingToIdlePoint = false;
 
     public void SetCurrentAttackType(EnemyAttackType type) => _currentType = type;
+
+    void RangeSetting(float scale) => _followTarget.SetStoppingDistance(20f * scale);
 
     public void CallStart()
     {
@@ -91,13 +93,13 @@ public class EnemyAction : MonoBehaviour
     }
 
     // ── Setup Attack Types ───────────────────────────────────────────────────
-    public void SetupAttackType()
+    public void SetupAttackType(float scale)
     {
         switch (_currentType)
         {
-            case EnemyAttackType.Range:   RangeSetting();   break;
-            case EnemyAttackType.Malee:   MaleeSetting();   break;
-            case EnemyAttackType.Explode: ExplodeSetting(); break;
+            case EnemyAttackType.Range:   RangeSetting(scale);   break;
+            case EnemyAttackType.Malee:   MaleeSetting(scale);   break;
+            case EnemyAttackType.Explode: ExplodeSetting(scale); break;
         }
     }
 
@@ -126,21 +128,20 @@ public class EnemyAction : MonoBehaviour
     {
         if (_attackTimer > 0f || bulletPrefab == null) return;
 
-        // Spawn bullet facing the player
         Vector3 dir = (player.transform.position - transform.position).normalized;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
-
-
-        GameObject bullet = Instantiate(bulletPrefab, transform.position + (dir * 3), Quaternion.Euler(0f, 0f, angle));
+        // FIXED: Spawn the bullet further out so large enemies don't spawn it inside themselves!
+        float bulletSpawnOffset = 3f * transform.localScale.x; 
+        GameObject bullet = Instantiate(bulletPrefab, transform.position + (dir * bulletSpawnOffset), Quaternion.Euler(0f, 0f, angle));
 
         bullet.GetComponent<Bullet>().Damage = _enemyStat.stat.damage;
-
         _attackTimer = _attackCooldown;
     }
 
+
     // ── Melee ────────────────────────────────────────────────────────────────
-    void MaleeSetting() => _followTarget.SetStoppingDistance(2f);
+    void MaleeSetting(float scale) => _followTarget.SetStoppingDistance(2f * scale);
 
     void TickMeleeAttack(GameObject player)
     {
@@ -162,7 +163,7 @@ public class EnemyAction : MonoBehaviour
     }
 
     // ── Explode ───────────────────────────────────────────────────────────────
-    void ExplodeSetting() => _followTarget.SetStoppingDistance(3f);
+    void ExplodeSetting(float scale) => _followTarget.SetStoppingDistance(3f * scale);
 
     void TickExplodeAttack(GameObject player)
     {

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class PuckHandler : MonoBehaviour
 {
@@ -7,7 +8,9 @@ public class PuckHandler : MonoBehaviour
     private List<PuckData> _equippedPucks;
     private PlayerStat _playerStat;
 
-    public int MaxListCount  = 12;
+    public event Action OnPucksChanged;
+
+    public int MaxListCount  = 9;
     void Start()
     {
         _playerStat = GetComponent<PlayerStat>();
@@ -34,13 +37,17 @@ public class PuckHandler : MonoBehaviour
     public void EquipPuck(PuckData puckData)
     {
         if (puckData == null) return;
+        if (!GameManager.Instance.CanEquipPuck(puckData) && !puckData._isNegative)
+        {
+            Debug.LogWarning($"Not enough points for {puckData.puckName}. Need {puckData.PointCost}, have {GameManager.Instance.PuckPoints}");
+            return;
+        }
 
-        //if (_equippedPucks.Contains(puckData)) return;
-
-        GameManager.Instance.PuckCounts ++;
-        //Debug.Log("Packed! " + GameManager.Instance.PuckCounts);
-
+        GameManager.Instance.SpendPoints(puckData);
+        GameManager.Instance.PuckCounts++;
         _equippedPucks.Add(puckData);
+
+        OnPucksChanged?.Invoke();
     }
 
     /// <summary>퍽 해제 — 드래그로 꺼낼 때 호출</summary>
@@ -48,10 +55,31 @@ public class PuckHandler : MonoBehaviour
     {
         if (puckData == null) return;
 
-        GameManager.Instance.PuckCounts --;
-       // Debug.Log("UnPacked!" + GameManager.Instance.PuckCounts);
+        if (puckData._isNegative)
+            GameManager.Instance.SpendPoints(puckData); // ← negative pucks cost points to remove
+        else
+            GameManager.Instance.RefundPoints(puckData); // ← normal pucks refund on remove
 
+        GameManager.Instance.PuckCounts--;
         _equippedPucks.Remove(puckData);
+
+        OnPucksChanged?.Invoke();
+    }
+
+    public void EquitWithoutPoints(PuckData puckData)
+    {
+        GameManager.Instance.PuckCounts++;
+        _equippedPucks.Add(puckData);
+
+        OnPucksChanged?.Invoke();
+    }
+
+    public void UnequitWithoutPoints(PuckData puckData)
+    {
+        GameManager.Instance.PuckCounts--;
+        _equippedPucks.Remove(puckData);
+
+        OnPucksChanged?.Invoke();
     }
 
     public void RecalculateChangedPucks()
@@ -63,6 +91,14 @@ public class PuckHandler : MonoBehaviour
 
         _playerStat.Recalculate();
         GetComponent<PlayerController>().RecalculatePlayerState();
+    }
+
+    public void UnequitRamdon()
+    {
+        int _random = UnityEngine.Random.Range(0, MaxListCount - 1);
+        PuckData puckData = _equippedPucks[_random];
+
+        UnequitWithoutPoints(puckData);
     }
 
     public IReadOnlyList<PuckData> GetEquippedPucks() => _equippedPucks;

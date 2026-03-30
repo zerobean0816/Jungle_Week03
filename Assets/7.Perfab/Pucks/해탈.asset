@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 981468b876913304787d89ceefca757a, type: 3}
+  m_Name: "\uD574\uD0C8"
+  m_EditorClassIdentifier: Assembly-CSharp::PuckData
+  puckName: "\uD574\uD0C8 (20 cost)"
+  description: "\uC2A4\uD2B8\uB798\uC2A4\uB97C \uC65C \uBC1B\uB294\uAC00..\n"
+  icon: {fileID: 0}
+  size: 1
+  _isNegative: 0
+  modifiers:
+  - stat: 9
+    value: -3
+    isMultiplier: 0
+  - stat: 8
+    value: 5
+    isMultiplier: 0
+  rarity: 2

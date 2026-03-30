@@ -22,7 +22,6 @@ public class UIPuckItem : MonoBehaviour,
         // Check if player is null
         CheckPlayerReference();
 
-        Image = GetComponent<Image>();
         _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
         _canvasGroup = GetComponent<CanvasGroup>();
 
@@ -31,9 +30,16 @@ public class UIPuckItem : MonoBehaviour,
         ChangeColorByType();
     }
 
-    public void Init()
+    public void Init(PuckData data)
     {
-        _originalParent = transform.parent; // 원래 부모 저장
+        Puckdata = data;
+        _originalParent = transform.parent;
+        
+        _playerPuckHandler = GameManager.Instance.Player.GetComponent<PuckHandler>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+
+        ChangePuckItemName();
+        ChangeColorByType();
     }
 
     void CheckPlayerReference()

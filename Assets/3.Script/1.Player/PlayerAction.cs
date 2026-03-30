@@ -39,7 +39,7 @@ public class PlayerAction : MonoBehaviour
     // Player Puck System Staty / End commend.
     public void PerformSkill(ref bool _spaceisPressed)
     {
-        if (_spaceisPressed && GameManager.Instance.GameState == GameState.Playing)
+        if (_spaceisPressed && GameManager.Instance.GameState == GameState.Playing && GameManager.Instance.CanOpenPuckPause)
         {
             //Debug.Log("[PlayerController] : Space Pressed! Entering Puck Pause State."); // 스페이스바 입력 시 행동 예시 (콘솔에 로그 출력)
             GameManager.Instance.EnterPuckPause(); // 퍽 일시정지 상태로 전환
@@ -48,6 +48,16 @@ public class PlayerAction : MonoBehaviour
         {
             //Debug.Log("[PlayerController] : Space Pressed! Exiting Puck Pause State."); // 스페이스바 입력 시 행동 예시 (콘솔에 로그 출력)
             GameManager.Instance.ExitPuckPause(); // 퍽 일시정지 상태 해제
+        }
+        else if (_spaceisPressed && GameManager.Instance.PuckPoints >= 0)
+        {
+            string text = "스텟창을 열수 있는 포인트가 부족합니다 ";
+            FloatingTextSpawner.Instance.PoolText(text, Color.blue, transform.position);
+        }
+        else if (_spaceisPressed)
+        {
+            string text = "스텟 설정 창은 쿨다운 중입니다: " + GameManager.Instance.PuckPauseCooldownRemaining;
+            FloatingTextSpawner.Instance.PoolText(text, Color.blue, transform.position);
         }
 
         _spaceisPressed = false; // 스페이스바 입력 초기
@@ -125,16 +135,16 @@ public class PlayerAction : MonoBehaviour
     private void FireBullet()
     { // Maximum possible spread in degrees at 0 accuracy
         float randomOffset = (Random.Range(-currentSpread, currentSpread)
-                        + Random.Range(-currentSpread, currentSpread)) / 2f;
+                    + Random.Range(-currentSpread, currentSpread)) / 2f;
 
         Quaternion fireRotation = _meshTransfrom.rotation * Quaternion.Euler(0, 0, randomOffset);
         
-        float offsetDistance = 2.0f; 
-        Vector3 firePoint = _meshTransfrom.position + (_meshTransfrom.right * offsetDistance);
+        // Push spawn point further out so it doesn't overlap player collider
+        Vector3 firePoint = _meshTransfrom.position + (_meshTransfrom.right * 2f);
 
-        Instantiate(_bulletPrefab, firePoint, fireRotation);
-
-        _bulletPrefab.GetComponent<Bullet>().SetBulletDamage(_playerStat.damage);
-        _bulletPrefab.GetComponent<Bullet>().SetBulletScale (_playerStat.bulletScale);
+        GameObject firedBullet = Instantiate(_bulletPrefab, firePoint, fireRotation);
+        Bullet bullet = firedBullet.GetComponent<Bullet>();
+        bullet.SetBulletDamage(_playerStat.damage);
+        bullet.SetBulletScale(_playerStat.bulletScale);
     }
 }

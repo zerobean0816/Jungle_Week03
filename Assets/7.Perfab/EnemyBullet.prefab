@@ -141,7 +141,7 @@ MonoBehaviour:
   _lifetime: 2
   _rb: {fileID: 0}
   Damage: 0
-  Speed: 25
+  Speed: 35
   isPenetrating: 0
 --- !u!136 &8499628889090036814
 CapsuleCollider:

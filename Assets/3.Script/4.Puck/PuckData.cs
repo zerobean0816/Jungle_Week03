@@ -14,4 +14,22 @@ public class PuckData : ScriptableObject
     public bool _isNegative;
 
     public StatModifier[] modifiers;
+
+    public enum PuckRarity { Normal, Rare,Epic}
+
+    // Add inside PuckData ScriptableObject
+    public PuckRarity rarity;
+
+    public int PointCost
+    {
+        get
+        {
+            switch (rarity)
+            {
+                case PuckRarity.Epic: return 20;
+                case PuckRarity.Rare: return 5; // Added a cost for Rare!
+                default: return 2; // Normal
+            }
+        }
+    }
 }

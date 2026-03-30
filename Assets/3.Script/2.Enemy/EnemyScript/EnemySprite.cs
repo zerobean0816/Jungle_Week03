@@ -3,10 +3,10 @@ using UnityEngine;
 public class EnemySprite : MonoBehaviour
 {
     SpriteRenderer _spriteRenderer;
-    [SerializeField] Sprite _idelSprite;
-    [SerializeField] Sprite _attackSprite;
+    // [SerializeField] Sprite _idelSprite;
+    // [SerializeField] Sprite _attackSprite;
 
-    void Start()
+    public void CallStart()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
     }

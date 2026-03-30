@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981468b876913304787d89ceefca757a, type: 3}
   m_Name: Expert
   m_EditorClassIdentifier: Assembly-CSharp::PuckData
-  puckName: "\uC219\uB828\uC790"
+  puckName: "\uC219\uB828\uC790 (5 cost)"
   description: "\uC544\uC544.. \uC775\uC219\uD55C \uC190\uB9DB"
   icon: {fileID: 0}
   size: 1
@@ -22,8 +22,12 @@ MonoBehaviour:
     value: -0.2
     isMultiplier: 1
   - stat: 7
-    value: 0.5
+    value: 0.3
     isMultiplier: 1
-  - stat: 2
-    value: 0.1
+  - stat: 9
+    value: -0.4
     isMultiplier: 1
+  - stat: 10
+    value: -0.3
+    isMultiplier: 1
+  rarity: 1

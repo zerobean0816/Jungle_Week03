@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: "\uD658\uC0C1\uD1B5"
   m_EditorClassIdentifier: Assembly-CSharp::PuckData
   puckName: "\uD658\uC0C1\uD1B5"
-  description: "\uBB54\uAC00 \uAC1C\uC18D \uC544\uD508\uAC83 \uAC19\uC2B5\uB2C8\uB2E4.."
+  description: "\uBB54\uAC00 \uAC1C\uC18D \uC544\uD508\uAC83 \uAC19\uC2B5\uB2C8\uB2E4..
+    (2 cost)"
   icon: {fileID: 0}
   size: 1
-  _isNegative: 0
+  _isNegative: 1
   modifiers:
   - stat: 8
     value: -0.5
@@ -24,3 +25,4 @@ MonoBehaviour:
   - stat: 9
     value: 0.2
     isMultiplier: 1
+  rarity: 0

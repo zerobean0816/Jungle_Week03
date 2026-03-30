@@ -202,6 +202,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIPuckItem
   Puckdata: {fileID: 0}
   Canvas: {fileID: 0}
+  Image: {fileID: 3622542292609852102}
   OccupiedStartIndex: -1
   _cardName: {fileID: 6329599506599839819}
 --- !u!1 &5078836760812972451

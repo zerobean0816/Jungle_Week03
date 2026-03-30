@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981468b876913304787d89ceefca757a, type: 3}
   m_Name: Tiny
   m_EditorClassIdentifier: Assembly-CSharp::PuckData
-  puckName: "\uC800\uCCB4\uC911"
+  puckName: "\uAE30\uB3D9\uC804 ((5 cost))"
   description: "\uB2EC\uB9AC\uAE30 \uC804\uC5D0 \uBB34\uAC70\uC6B4 \uAC83\uBD80\uD130
     \uB0B4\uB824 \uB193\uC790\uACE0.."
   icon: {fileID: 0}
@@ -20,11 +20,15 @@ MonoBehaviour:
   _isNegative: 0
   modifiers:
   - stat: 0
-    value: -0.3
+    value: -0.1
     isMultiplier: 1
   - stat: 1
-    value: -0.2
+    value: -0.1
     isMultiplier: 1
   - stat: 6
     value: -0.3
     isMultiplier: 1
+  - stat: 2
+    value: 0.6
+    isMultiplier: 1
+  rarity: 1

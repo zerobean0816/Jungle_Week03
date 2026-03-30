@@ -95,10 +95,12 @@ public class UIManager : MonoBehaviour
 
                 case GameState.GameOver:
                     CurrentUI = UIType.GameOver;
+                    OnGameOverUI();
                     break;
 
                 case GameState.Win:
                     CurrentUI = UIType.GameClear; // 승리도 게임 클리어 UI로 처리
+                    OnGameClearUI();
                     break;
 
                 case GameState.MainMenu:
@@ -131,7 +133,6 @@ public class UIManager : MonoBehaviour
     void OnPauseState()
     {
         ShowPauseUI();
-        DismissGameUI();
     }
 
     void OnMainMenuState()
@@ -142,6 +143,17 @@ public class UIManager : MonoBehaviour
         DismissPauseUI();
     }
 
+   void OnGameOverUI()
+    {
+        DismissAllUI();
+        ShowGameOverUI();
+    }
+
+    void OnGameClearUI()
+    {
+        DismissAllUI();
+        ShowGameClearUI();
+    }
 
     void DismissAllUI()
     {

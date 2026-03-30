@@ -12,15 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 981468b876913304787d89ceefca757a, type: 3}
   m_Name: "\uC54C\uBCF4\uCE60"
   m_EditorClassIdentifier: Assembly-CSharp::PuckData
-  puckName: "\uC54C\uBCF4\uCE60"
+  puckName: "\uC54C\uBCF4\uCE60 (2 cost)"
   description: "\"\uACE0\uD1B5\uC758 \uB4F1\uAC00 \uAD50\uD658\""
   icon: {fileID: 0}
   size: 1
   _isNegative: 0
   modifiers:
   - stat: 8
-    value: 2
-    isMultiplier: 0
-  - stat: 11
-    value: 1
+    value: 1.5
     isMultiplier: 1
+  - stat: 11
+    value: 0.7
+    isMultiplier: 1
+  rarity: 0

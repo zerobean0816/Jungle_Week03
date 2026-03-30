@@ -42,6 +42,9 @@ public class FloatingText : MonoBehaviour
         Color startColor = _textElement.color;
         Vector3 startWorldPos = _root.position;
 
+        yield return new WaitForSeconds(0.5f);
+        
+        // 1. Float up over full duration
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
@@ -52,6 +55,7 @@ public class FloatingText : MonoBehaviour
 
             yield return null;
         }
+
 
         _textElement.color = startColor;
         _root.gameObject.SetActive(false);

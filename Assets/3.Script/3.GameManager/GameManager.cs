@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public enum GameState { Playing, PuckPaused, Paused, GameOver, Win , MainMenu}
 
@@ -32,15 +34,43 @@ public class GameManager : MonoBehaviour
     public UnityEvent OnPuckPauseExit;
     public UnityEvent OnGameStateChanged;
 
+    public UIPuckSlotContainer SlotContainer;
 
+    [Header("Puck Pause Settings")]
+    private float _puckPauseCooldown = 3f;
+    private float _puckPauseCooldownTimer = 0f;
+    public bool CanOpenPuckPause => _puckPauseCooldownTimer <= 0f && PuckPoints > 0;
+    public float PuckPauseCooldownRemaining => _puckPauseCooldownTimer;
+
+
+    [Header("Puck Datas")]
     public int PuckCounts;
-
     public List<PuckData> PuckDatas;
     public List<PuckData> StressPuckData;
 
+    [Header("Puck Point Settings")]
+    private int _puckPoints = 3;
+    public int PuckPoints
+    {
+        get { return _puckPoints; }
+        set
+        {
+            _puckPoints = Mathf.Max(0, value); // ← Max, not Min, prevents going below 0
+        }
+    }
+
+    public bool CanEquipPuck(PuckData puck) => PuckPoints >= puck.PointCost;
+    public void EarnPoints(int amount) => PuckPoints += amount;
+    public void SpendPoints(PuckData puck) => PuckPoints -= puck.PointCost;
+    public void RefundPoints(PuckData puck) => PuckPoints += puck.PointCost;
+
+
+    public int Spowner = 0;
+    private int MaxSpowner = 5;
+
     public static GameManager Instance;
 
-
+    public event Action OnPuckPaused;
 
 
     private void Awake()
@@ -48,7 +78,6 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -84,32 +113,50 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        switch(GameState)
+
+        switch (GameState)
         {
             case GameState.Playing:
-                // 게임이 진행 중일 때의 로직
-
                 Player.GetComponent<PlayerStat>().stat.currentStress += Time.deltaTime;
-                    
-                break;
-            case GameState.GameOver:
-                // 게임 오버 상태일 때의 로직
-                break;
-            case GameState.PuckPaused:
-                // 게임이 일시정지 상태일 때의 로직
-                break;
-            case GameState.Paused:
 
+                if (_puckPauseCooldownTimer > 0f)
+                    _puckPauseCooldownTimer -= Time.unscaledDeltaTime;
+
+                if (Spowner >= MaxSpowner)
+                {
+                     GameState = GameState.Win;
+                }
+
+                // FIXED: Use PauseGame() directly
+                if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+                {
+                    PauseGame(); 
+                }
+                break;
+
+            case GameState.PuckPaused:
+                if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+                {
+                    ExitPuckPause(); // FIXED: Use the clean exit method you already made!
+                }
+                break;
+
+            case GameState.Paused:
+                // ADDED: Allow the player to unpause by pressing Esc again!
+                if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+                {
+                    UnPauseGame();
+                }
                 break;
             case GameState.Win:
-                // 게임 승리 상태일 때의 로직
+                Time.timeScale = 0f;
+
                 break;
             case GameState.MainMenu:
                 // 메인 메뉴 상태일 때의 로직   
                 break;
 
              default:
-                 Debug.LogWarning($"Unhandled GameState: {GameState}");
                  break;
         }
 
@@ -119,10 +166,19 @@ public class GameManager : MonoBehaviour
     public void EnterPuckPause()
     {
         if (GameState != GameState.Playing) return;
+        if (!CanOpenPuckPause)
+        {
+            Debug.Log($"[GameManager] Puck pause on cooldown: {_puckPauseCooldownTimer:F1}s remaining");
+            return;
+        }
+        // No timer set here anymore
+
+        PuckPoints--;
         Player.GetComponent<PlayerStat>().EnterPuckPause();
-        
-        GameState     = GameState.PuckPaused;
-        Time.timeScale   = .0f;
+        OnPuckPaused?.Invoke();
+
+        GameState = GameState.PuckPaused;
+        Time.timeScale = 0f;
         OnPuckPauseEnter.Invoke();
     }
 
@@ -131,10 +187,12 @@ public class GameManager : MonoBehaviour
     {
         if (GameState != GameState.PuckPaused) return;
 
-        GameState     = GameState.Playing;
+        _puckPauseCooldownTimer = _puckPauseCooldown; // ← moved here from EnterPuckPause
+
+        GameState = GameState.Playing;
         Player.GetComponent<PlayerStat>().ConfirmModifiers();
 
-        Time.timeScale   = 1f;
+        Time.timeScale = 1f;
         OnPuckPauseExit.Invoke();
     }
 
@@ -172,7 +230,7 @@ public class GameManager : MonoBehaviour
     public void ReturnToMainMenu()
     {
         Time.timeScale = 1f;
-        UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
     }
 
     public void QuitGame()
@@ -187,6 +245,14 @@ public class GameManager : MonoBehaviour
 
         GameState = GameState.Paused;
         Time.timeScale = 0f;
+    }
+
+    public void UnPauseGame()
+    {
+        if (GameState != GameState.Paused) return;
+
+        GameState = GameState.Playing;
+        Time.timeScale = 1f;
     }
 }
 

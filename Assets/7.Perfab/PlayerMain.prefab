@@ -44,9 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b41361a5685cd949a592c6b54b11565, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FloatingTextSpawner
-  textPrefab: {fileID: 3332297280428560608, guid: ad59ee10fb6ea814282f0f54a123f40a, type: 3}
+  textPrefab: {fileID: 4061548879685066579, guid: cc4b2c56146b2a1469ee080921b27667, type: 3}
   _poolSize: 5
-  _textSpawnTransform: {fileID: 8659138935632669445}
 --- !u!1 &3499709019509608380
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,8 +177,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1851486621
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -271,8 +270,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1851486621
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
@@ -431,7 +430,7 @@ Transform:
   m_GameObject: {fileID: 8140518981022072869}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.15, z: 0}
+  m_LocalPosition: {x: 0, y: 2.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -565,29 +564,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStat
   stat:
-    baseHealth: 100
+    baseHealth: 120
     baseDamage: 15
-    baseMoveSpeed: 13
+    baseMoveSpeed: 20
     baseAttackSpeed: 2
     baseMaxStress: 100
     baseBulletScale: 1
     basePlayerScale: 1
-    baseAccuracy: 45
-    baseHPRegen: 1
-    baseStressRegen: 2
-    baseStressPerDamage: 10
+    baseAccuracy: 55
+    baseHPRegen: 3
+    baseStressRegen: 1
+    baseStressPerDamage: 7
     baseDamageReceived: 1
-    maxHealth: 100
+    maxHealth: 120
     damage: 15
-    moveSpeed: 13
+    moveSpeed: 20
     attackSpeed: 2
     maxStress: 100
     bulletScale: 1
     playerScale: 1
-    accuracy: 45
-    hpRegen: 1
-    stressRegen: 2
-    stressPerDamage: 10
+    accuracy: 55
+    hpRegen: 3
+    stressRegen: 1
+    stressPerDamage: 7
     damageReceived: 1
     currentHealth: 100
     currentStress: 0
@@ -633,7 +632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b4dc9a46f830f3419d0a0c463a63634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PuckHandler
-  MaxListCount: 12
+  MaxListCount: 6
 --- !u!114 &6108032483613660812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -785,6 +784,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 188b945662bbb494f9c5fb04f73dc1ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStressControl
+  _slotContainer: {fileID: 0}
+  _puckItemPrefab: {fileID: 2146554866052334411, guid: 48bfc70969088404091812f255677b7e, type: 3}
 --- !u!1001 &2788466427024489153
 PrefabInstance:
   m_ObjectHideFlags: 0

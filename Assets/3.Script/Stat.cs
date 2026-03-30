@@ -105,7 +105,7 @@ public class Stat
         stressPerDamage  = baseStressPerDamage;
         damageReceived   = baseDamageReceived;
 
-        if (modifiers == null || modifiers.Count == 0) 
+        if (modifiers == null || modifiers.Count == 0)
         {
             FinalizeStats(previousMaxHealth);
             return;
@@ -124,34 +124,39 @@ public class Stat
                 ApplyFlatModifier(mod);
         }
 
-        // 3. Apply Multipliers with a Floor
-        // We use a helper function to prevent the (1 + sum) from going below 0 or a specific minimum.
-        maxHealth        = ApplyModWithFloor(maxHealth,        multiplierSums[StatType.MaxHP]);
-        damage           = ApplyModWithFloor(damage,           multiplierSums[StatType.AttackPower]);
-        moveSpeed        = ApplyModWithFloor(moveSpeed,        multiplierSums[StatType.MoveSpeed], 0.1f); // Minimum 10% speed
-        attackSpeed      = ApplyModWithFloor(attackSpeed,      multiplierSums[StatType.AttackSpeed], 0.1f);
-        maxStress        = ApplyModWithFloor(maxStress,        multiplierSums[StatType.MaxStress]);
-        bulletScale      = ApplyModWithFloor(bulletScale,      multiplierSums[StatType.BulletScale], 0.1f);
-        playerScale      = ApplyModWithFloor(playerScale,      multiplierSums[StatType.PlayerScale], 0.1f);
-        accuracy         = ApplyModWithFloor(accuracy,         multiplierSums[StatType.Accuracy]);
-        hpRegen          = ApplyModWithFloor(hpRegen,          multiplierSums[StatType.HPRegen], -100f); // Regen can be negative (poison)?
-        stressRegen      = ApplyModWithFloor(stressRegen,      multiplierSums[StatType.StressRegen]);
-        stressPerDamage  = ApplyModWithFloor(stressPerDamage,  multiplierSums[StatType.StressPerDamage]);
-        damageReceived   = ApplyModWithFloor(damageReceived,   multiplierSums[StatType.DamageReceived], 0f);
+        // 3. Apply Multipliers — each stat has its own min/max range
+        maxHealth       = ApplyModClamped(maxHealth,       multiplierSums[StatType.MaxHP],           0.1f,  5f);   // 10% ~ 500%
+        damage          = ApplyModClamped(damage,          multiplierSums[StatType.AttackPower],      0.1f,  5f);   // 10% ~ 500%
+        moveSpeed       = ApplyModClamped(moveSpeed,       multiplierSums[StatType.MoveSpeed],        0.2f,  3f);   // 20% ~ 300%
+        attackSpeed     = ApplyModClamped(attackSpeed,     multiplierSums[StatType.AttackSpeed],      0.2f,  6f);   // 20% ~ 300%
+        maxStress       = ApplyModClamped(maxStress,       multiplierSums[StatType.MaxStress],        0.5f,  3f);   // 50% ~ 300%
+        bulletScale     = ApplyModClamped(bulletScale,     multiplierSums[StatType.BulletScale],      0.1f,  5f);   // 10% ~ 500%
+        playerScale     = ApplyModClamped(playerScale,     multiplierSums[StatType.PlayerScale],      0.1f,  3f);   // 10% ~ 300%
+        accuracy        = ApplyModClamped(accuracy,        multiplierSums[StatType.Accuracy],         0.1f,  2f);   // 10% ~ 200%
+        hpRegen         = ApplyModClamped(hpRegen,         multiplierSums[StatType.HPRegen],         -5f,   5f);    // can go negative (poison)
+        stressRegen     = ApplyModClamped(stressRegen,     multiplierSums[StatType.StressRegen],     -10f,  5f);    // ← can go negative (stress relief)
+        stressPerDamage = ApplyModClamped(stressPerDamage, multiplierSums[StatType.StressPerDamage],  0f,   5f);
+        damageReceived  = ApplyModClamped(damageReceived,  multiplierSums[StatType.DamageReceived],   0f,   5f);
 
         FinalizeStats(previousMaxHealth);
     }
 
-    // Helper to handle the math safely
-    private float ApplyModWithFloor(float baseVal, float multiplierSum, float absoluteMin = 0f)
+    private float ApplyModClamped(float baseVal, float multiplierSum, float minMultiplier, float maxMultiplier)
     {
-        // Ensure the multiplier itself doesn't result in a value less than 0
-        // e.g., if multiplierSum is -1.5, (1 + -1.5) = -0.5. We clamp that.
-        float finalMultiplier = Mathf.Max(0f, 1f + multiplierSum);
-        
-        // Calculate final value and ensure it doesn't cross the absolute minimum floor
-        return Mathf.Max(absoluteMin, baseVal * finalMultiplier);
+        float finalMultiplier = Mathf.Clamp(1f + multiplierSum, minMultiplier, maxMultiplier);
+        return baseVal * finalMultiplier;
     }
+
+    // Helper to handle the math safely
+    // private float ApplyModWithFloor(float baseVal, float multiplierSum, float absoluteMin = 0f)
+    // {
+    //     // Ensure the multiplier itself doesn't result in a value less than 0
+    //     // e.g., if multiplierSum is -1.5, (1 + -1.5) = -0.5. We clamp that.
+    //     float finalMultiplier = Mathf.Max(0f, 1f + multiplierSum);
+        
+    //     // Calculate final value and ensure it doesn't cross the absolute minimum floor
+    //     return Mathf.Max(absoluteMin, baseVal * finalMultiplier);
+    // }
 
     private void FinalizeStats(float previousMaxHealth)
     {
