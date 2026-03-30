@@ -6,7 +6,7 @@ public class FollowTarget : MonoBehaviour
     private NavMeshAgent navMeshAgent;
     public Transform targetTransform;
     public Vector3 targetPosition;
-    public float stoppingDistance = 0.5f;
+    public float stoppingDistance = 2f;
 
     void Awake()
     {
@@ -35,6 +35,13 @@ public class FollowTarget : MonoBehaviour
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0f, 0f, angle);
         }
+    }
+
+    
+    public void SetStoppingDistance(float distance)
+    {
+        navMeshAgent.stoppingDistance = distance;
+        stoppingDistance = distance;
     }
 
     // Public method to set a new target position

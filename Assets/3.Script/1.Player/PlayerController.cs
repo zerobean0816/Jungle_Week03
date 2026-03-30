@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +16,7 @@ public enum PlayerState
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PuckHandler))]
 [RequireComponent(typeof(PlayerAction))]
+[RequireComponent(typeof(PlayerStressControl))]
 
 public class PlayerController : MonoBehaviour, IDamaged
 {
@@ -24,7 +26,11 @@ public class PlayerController : MonoBehaviour, IDamaged
     [SerializeField] private PlayerStat _playerStat; // PlayerStat 컴포넌트 참조
     [SerializeField] private PuckHandler _puckHandler; // PuckHandler 컴포넌트 참조
     [SerializeField] private PlayerAction _playerAction; // PlayerAction 컴포넌트 참조
+    [SerializeField] private PlayerStressControl _playerStressControl; // PlayerAction 컴포넌트 참조
 
+
+    public event Action<float, Vector3> OnDamaged;
+    public static event Action<float, Vector3> OnAnyCharacterDamaged;
 
     // player state
     public PlayerState CurrentState; // 현재 플레이어 상태
@@ -46,8 +52,8 @@ public class PlayerController : MonoBehaviour, IDamaged
     [SerializeField] private bool _spaceisPressed; // 스페이스바 입력 여부
 
     private float _previousScaleValue = 1f;
-
     private Camera _mainCamera; // 메인 카메라 참조
+    [SerializeField] private Transform _textTransfrom;
 
     private bool _isControlable => 
         CurrentState != PlayerState.Crazy && CurrentState != PlayerState.Panic && CurrentState != PlayerState.Stuned; // 이동 가능한 상태인지 여부
@@ -59,7 +65,8 @@ public class PlayerController : MonoBehaviour, IDamaged
         _playerInput = GetComponent<PlayerInput>(); // PlayerMove 컴포넌트 가져오기
         _playerStat = GetComponent<PlayerStat>(); // PlayerStat 컴포넌트 가져오기
         _puckHandler = GetComponent<PuckHandler>(); // PuckHandler 컴포넌트 가져오기
-        _playerAction = GetComponent<PlayerAction>(); // PlayerAction 컴포넌트 가져오기
+        _playerAction = GetComponent<PlayerAction>(); // PlayerAction 컴포넌트 가져오기cvbxn
+        _playerStressControl = GetComponent<PlayerStressControl>();
 
         _moveAction = _playerInput.actions["Move"]; // PlayerMove에서 이동 입력 액션 가져오기
         _attackAction = _playerInput.actions["Attack"]; // PlayerMove에서 공격 입력 액션 가져오기
@@ -77,7 +84,7 @@ public class PlayerController : MonoBehaviour, IDamaged
     {
         ReadInputs();
 
-         _playerAction.PerformSkill(ref _spaceisPressed);
+        _playerAction.PerformSkill(ref _spaceisPressed);
 
         if (GameManager.Instance.GameState == GameState.PuckPaused)
         {
@@ -85,31 +92,26 @@ public class PlayerController : MonoBehaviour, IDamaged
             return;
         }
         
-        _movement = _moveAction.ReadValue<Vector2>(); // PlayerMove에서 이동 방향 가져오기
+        _movement = _moveAction.ReadValue<Vector2>();
 
-        //Debug.Log("PlayerMoveInput: " + _movement);
-
-       if (GameManager.Instance.GameState == GameState.Playing)
+        if (GameManager.Instance.GameState == GameState.Playing)
         {
-            // 초당 체력 회복
+            // 1. Health Regen
             if (_playerStat.stat.currentHealth < _playerStat.stat.maxHealth)
             {
                 _playerStat.stat.currentHealth += _playerStat.stat.hpRegen * Time.deltaTime;
             }
 
-            // 초당 스트레스 증가
-            _playerStat.stat.currentStress += _playerStat.stat.stressRegen * Time.deltaTime;
-        }
-
-        if (_playerStat.stat.currentStress >= _playerStat.stat.maxStress)
-        {
-            // Add stress Generation here
+            // 2. Stress Regen (ONLY if the player is still in normal Idle state)
+            if (CurrentState == PlayerState.Idle)
+            {
+                _playerStressControl.AddStress(_playerStat.stat.stressRegen * Time.deltaTime, _textTransfrom.position);
+            }
         }
     }
 
     void FixedUpdate()
     {   
-        // 상태가 변경되었는지 확인
         if (CurrentState != _lastState)
         {
             _lastState = CurrentState;
@@ -122,14 +124,18 @@ public class PlayerController : MonoBehaviour, IDamaged
                 break;
 
             case PlayerState.Crazy:
-                ActCrazy();
+                // Allow them to move, but they might be using a special puck!
+                ActIdle(); 
                 break;
 
             case PlayerState.Panic:
-                ActPanic();
+                // Allow them to move slowly
+                ActIdle();
                 break;
 
             case PlayerState.Stuned:
+                // Stop all movement immediately
+                _rb.linearVelocity = Vector3.zero;
                 break;
         }
 
@@ -167,7 +173,6 @@ public class PlayerController : MonoBehaviour, IDamaged
 
         Vector3 targetVelocity = new Vector3(_movement.x, _movement.y, 0f) * _playerStat.stat.moveSpeed;
 
-        // ✅ 부드럽게 속도 보간
         _rb.linearVelocity = Vector3.Lerp(_rb.linearVelocity, targetVelocity, Time.fixedDeltaTime * 20f);
 
         if (_isMouseReleased)
@@ -193,8 +198,11 @@ public class PlayerController : MonoBehaviour, IDamaged
     {
         float finalDamage = damageAmount * _playerStat.stat.damageReceived; // 배율 적용
         _playerStat.stat.currentHealth -= finalDamage;
-        _playerStat.stat.currentStress += _playerStat.stat.stressPerDamage; // 피격 스트레스
+        _playerStressControl.AddStress(_playerStat.stat.stressPerDamage, _textTransfrom.position);
 
+        OnDamaged?.Invoke(finalDamage,_textTransfrom.position);
+        OnAnyCharacterDamaged?.Invoke(finalDamage, _textTransfrom.position); // Broadcast globally!
+        
         if (_playerStat.stat.currentHealth <= 0)
             GameManager.Instance.TriggerGameOver();  // 체력이 0 이하가 되면 사망 처리
     }

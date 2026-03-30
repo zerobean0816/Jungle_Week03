@@ -30,29 +30,32 @@ public class EnemyStat : MonoBehaviour
     {
         stat.baseHealth = 50f;
         stat.baseMoveSpeed = 15f;
+        stat.basePlayerScale = 1.8f;
         stat.baseDamage = 8f;
         stat.baseAttackSpeed = 20f;
         stat.basePlayerScale = 1.8f;
-        stat.Recalculate();
+        stat.ResetByChange();
     }
 
     void SetStatTypeEpic()
     {
         stat.baseHealth = 200f;
         stat.baseMoveSpeed = 10f;
+        stat.basePlayerScale = 3f;
         stat.baseDamage = 12f;
         stat.baseAttackSpeed = 15f;
         stat.basePlayerScale = 2.2f;
-        stat.Recalculate();
+        stat.ResetByChange();
     }
 
     void SetStatTypeStocker()
     {
         stat.baseHealth = 30f;
         stat.baseMoveSpeed = 20f;
+        stat.basePlayerScale = 1.4f;
         stat.baseDamage = 4f;
         stat.baseAttackSpeed = 30f;
         stat.basePlayerScale = 1.5f;
-        stat.Recalculate();
+        stat.ResetByChange();
     }
 }

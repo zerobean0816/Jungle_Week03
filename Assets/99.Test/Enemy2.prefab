@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 8381886309400575398}
   - component: {fileID: 8958915034006354310}
   - component: {fileID: 6705202676721610898}
+  - component: {fileID: 945076413139631436}
   m_Layer: 0
   m_Name: Enemy2
   m_TagString: Untagged
@@ -175,7 +176,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 0
-  m_StoppingDistance: 0.3
+  m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -237,13 +238,18 @@ MonoBehaviour:
   Type: 0
   CurrentState: 0
   AttackType: 0
+  AttackRangeOnMalee: 0
+  bullet: {fileID: 3322593195632089749, guid: 208b5bb239303fb4f8a64faa496ed9ca, type: 3}
   _distBWPlayer: 0
   _isChasing: 0
   _isAttacking: 0
   _isDamaged: 0
+  _recognizeTimer: 0
+  _recognizeDuration: 3
+  _detectionRadius: 10
   _playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
 --- !u!114 &6705202676721610898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,3 +262,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bddeeca1bd11dc340956e7bfee02403b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAction
+  _attackCooldown: 1.5
+  _meleeLingerduration: 0.5
+--- !u!114 &945076413139631436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3623085598777794216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637b50604cce24643bc4ff5f7983a9db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemySprite
+  _idelSprite: {fileID: 0}
+  _attackSprite: {fileID: 0}

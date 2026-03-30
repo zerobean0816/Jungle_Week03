@@ -15,6 +15,21 @@ public class PuckHandler : MonoBehaviour
         NullCheck.IsNull(_playerStat, "PlayerStat component not found on player.");
     }
 
+    public List<StatModifier> GetCurrentModifiers()
+    {
+        List<StatModifier> allModifiers = new List<StatModifier>();
+
+        foreach (var puck in _equippedPucks)
+        {
+            if (puck != null && puck.modifiers != null)
+            {
+                allModifiers.AddRange(puck.modifiers);
+            }
+        }
+
+        return allModifiers;
+    }
+
     /// <summary>퍽 장착</summary>
     public void EquipPuck(PuckData puckData)
     {

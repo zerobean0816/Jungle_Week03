@@ -134,6 +134,7 @@ public class PlayerAction : MonoBehaviour
 
         Instantiate(_bulletPrefab, firePoint, fireRotation);
 
-        _bulletPrefab.GetComponent<Bullet>().Damage = _playerStat.damage;
+        _bulletPrefab.GetComponent<Bullet>().SetBulletDamage(_playerStat.damage);
+        _bulletPrefab.GetComponent<Bullet>().SetBulletScale (_playerStat.bulletScale);
     }
 }
